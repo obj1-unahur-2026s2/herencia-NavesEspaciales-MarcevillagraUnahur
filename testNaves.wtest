@@ -1,0 +1,225 @@
+﻿import naves.*
+
+describe "Nave Baliza" {
+  test "preparar viaje carga 30000 de combustible" {
+    const baliza = new NaveBaliza()
+    baliza.prepararViaje()
+    assert.equals(30000, baliza.combustible())
+  }
+
+  test "preparar viaje acelera 5000 kms/seg" {
+    const baliza = new NaveBaliza()
+    baliza.prepararViaje()
+    assert.equals(5000, baliza.velocidad())
+  }
+
+  test "preparar viaje cambia color de baliza a verde" {
+    const baliza = new NaveBaliza()
+    baliza.cambiarColorDeBaliza("azul")
+    baliza.prepararViaje()
+    assert.equals("verde", baliza.colorDeBaliza())
+  }
+
+  test "preparar viaje la pone paralela al sol" {
+    const baliza = new NaveBaliza()
+    baliza.irHaciaElSol()
+    baliza.prepararViaje()
+    assert.equals(0, baliza.direccion())
+  }
+
+  test "escapar hace que vaya hacia el sol" {
+    const baliza = new NaveBaliza()
+    baliza.escapar()
+    assert.equals(10, baliza.direccion())
+  }
+
+  test "avisar cambia el color de la baliza a rojo" {
+    const baliza = new NaveBaliza()
+    baliza.avisar()
+    assert.equals("rojo", baliza.colorDeBaliza())
+  }
+
+  test "esta tranquila si tiene combustible, velocidad moderada y color no es rojo" {
+    const baliza = new NaveBaliza(combustible = 5000, velocidad = 8000)
+    assert.that(baliza.estaTranquila())
+  }
+
+  test "no esta tranquila si el color de la baliza es rojo" {
+    const baliza = new NaveBaliza(combustible = 5000, velocidad = 8000)
+    baliza.cambiarColorDeBaliza("rojo")
+    assert.notThat(baliza.estaTranquila())
+  }
+
+  test "esta de relajo si no cambio nunca de color de baliza y esta tranquila" {
+    const baliza = new NaveBaliza(combustible = 5000, velocidad = 8000)
+    assert.that(baliza.estaDeRelajo())
+  }
+
+  test "no esta de relajo si ya cambio de color alguna vez" {
+    const baliza = new NaveBaliza(combustible = 5000, velocidad = 8000)
+    baliza.cambiarColorDeBaliza("azul")
+    assert.notThat(baliza.estaDeRelajo())
+  }
+}
+
+describe "Nave de Pasajeros" {
+  test "preparar viaje carga raciones de comida proporcionales a los pasajeros" {
+    const pasajeros = new NavePasajeros(pasajeros = 100)
+    pasajeros.prepararViaje()
+    assert.equals(400, pasajeros.racionesComida())
+  }
+
+  test "preparar viaje carga raciones de bebida proporcionales a los pasajeros" {
+    const pasajeros = new NavePasajeros(pasajeros = 100)
+    pasajeros.prepararViaje()
+    assert.equals(600, pasajeros.racionesBebida())
+  }
+
+  test "preparar viaje acerca un poco al sol" {
+    const pasajeros = new NavePasajeros(pasajeros = 50, direccion = 0)
+    pasajeros.prepararViaje()
+    assert.equals(1, pasajeros.direccion())
+  }
+
+  test "escapar duplica la velocidad" {
+    const pasajeros = new NavePasajeros(pasajeros = 50, velocidad = 10000)
+    pasajeros.escapar()
+    assert.equals(20000, pasajeros.velocidad())
+  }
+
+  test "avisar reparte 1 racion de comida por pasajero" {
+    const pasajeros = new NavePasajeros(pasajeros = 100, racionesComida = 400)
+    pasajeros.avisar()
+    assert.equals(300, pasajeros.racionesComida())
+  }
+
+  test "avisar reparte 2 raciones de bebida por pasajero" {
+    const pasajeros = new NavePasajeros(pasajeros = 100, racionesBebida = 600)
+    pasajeros.avisar()
+    assert.equals(400, pasajeros.racionesBebida())
+  }
+
+  test "esta de relajo si sirvio menos de 50 raciones de comida y esta tranquila" {
+    const pasajeros = new NavePasajeros(pasajeros = 10, combustible = 6000, velocidad = 5000)
+    assert.that(pasajeros.estaDeRelajo())
+  }
+
+  test "no esta de relajo si sirvio 50 o mas raciones de comida" {
+    const pasajeros = new NavePasajeros(pasajeros = 50, combustible = 6000, velocidad = 5000, racionesComida = 100)
+    pasajeros.avisar()
+    assert.notThat(pasajeros.estaDeRelajo())
+  }
+}
+
+describe "Nave Hospital" {
+  test "inicialmente los quirofanos no estan preparados" {
+    const hospital = new NaveHospital(pasajeros = 30)
+    assert.notThat(hospital.quirofanosPreparados())
+  }
+
+  test "recibir amenaza prepara los quirofanos" {
+    const hospital = new NaveHospital(pasajeros = 30)
+    hospital.recibirAmenaza()
+    assert.that(hospital.quirofanosPreparados())
+  }
+
+  test "esta tranquila si quirofanos no estan preparados" {
+    const hospital = new NaveHospital(pasajeros = 30, combustible = 5000, velocidad = 8000)
+    assert.that(hospital.estaTranquila())
+  }
+
+  test "no esta tranquila si los quirofanos estan preparados" {
+    const hospital = new NaveHospital(pasajeros = 30, combustible = 5000, velocidad = 8000)
+    hospital.prepararQuirofanos()
+    assert.notThat(hospital.estaTranquila())
+  }
+}
+
+describe "Nave de Combate" {
+  test "preparar viaje acelera 20000 en total" {
+    const combate = new NaveCombate(velocidad = 5000)
+    combate.prepararViaje()
+    assert.equals(25000, combate.velocidad())
+  }
+
+  test "preparar viaje la pone visible" {
+    const combate = new NaveCombate()
+    combate.ponerseInvisible()
+    combate.prepararViaje()
+    assert.notThat(combate.estaInvisible())
+  }
+
+  test "preparar viaje repliega los misiles" {
+    const combate = new NaveCombate()
+    combate.desplegarMisiles()
+    combate.prepararViaje()
+    assert.notThat(combate.misilesDesplegados())
+  }
+
+  test "preparar viaje emite mensaje de salida" {
+    const combate = new NaveCombate()
+    combate.prepararViaje()
+    assert.that(combate.emitioMensaje("Saliendo en misión"))
+  }
+
+  test "escapar acerca dos veces al sol" {
+    const combate = new NaveCombate(direccion = 0)
+    combate.escapar()
+    assert.equals(2, combate.direccion())
+  }
+
+  test "avisar emite mensaje de amenaza recibida" {
+    const combate = new NaveCombate()
+    combate.avisar()
+    assert.that(combate.emitioMensaje("Amenaza recibida"))
+  }
+
+  test "es escueta si ningun mensaje emitido supera los 30 caracteres" {
+    const combate = new NaveCombate()
+    combate.emitirMensaje("Hola")
+    combate.emitirMensaje("Alerta roja")
+    assert.that(combate.esEscueta())
+  }
+
+  test "no es escueta si algun mensaje supera los 30 caracteres" {
+    const combate = new NaveCombate()
+    combate.emitirMensaje("Este es un mensaje sumamente largo que supera los treinta caracteres")
+    assert.notThat(combate.esEscueta())
+  }
+
+  test "esta tranquila si misiles no estan desplegados" {
+    const combate = new NaveCombate(combustible = 8000, velocidad = 6000)
+    assert.that(combate.estaTranquila())
+  }
+
+  test "no esta tranquila si los misiles estan desplegados" {
+    const combate = new NaveCombate(combustible = 8000, velocidad = 6000)
+    combate.desplegarMisiles()
+    assert.notThat(combate.estaTranquila())
+  }
+}
+
+describe "Nave de Combate Sigilosa" {
+  test "esta tranquila solo si ademas esta visible" {
+    const sigilosa = new NaveCombateSigilosa(combustible = 8000, velocidad = 6000)
+    assert.that(sigilosa.estaTranquila())
+  }
+
+  test "no esta tranquila si esta invisible" {
+    const sigilosa = new NaveCombateSigilosa(combustible = 8000, velocidad = 6000)
+    sigilosa.ponerseInvisible()
+    assert.notThat(sigilosa.estaTranquila())
+  }
+
+  test "escapar despliega misiles" {
+    const sigilosa = new NaveCombateSigilosa()
+    sigilosa.escapar()
+    assert.that(sigilosa.misilesDesplegados())
+  }
+
+  test "escapar la vuelve invisible" {
+    const sigilosa = new NaveCombateSigilosa()
+    sigilosa.escapar()
+    assert.that(sigilosa.estaInvisible())
+  }
+}
